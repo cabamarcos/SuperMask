@@ -6,3 +6,5 @@ https://www.tensorflow.org/datasets/catalog/mnist?hl=es-419
 https://www.tensorflow.org/datasets/catalog/cifar10?hl=es-419
 
 https://github.com/tesla-is/MNIST-Kaggle-Competition-The-Winning-Solution
+
+https://www.kaggle.com/code/faressayah/cifar-10-images-classification-using-cnns-88
