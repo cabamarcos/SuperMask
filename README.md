@@ -1,5 +1,9 @@
 # SuperMask
-TFG sobre la creación y experimentación de supermáscaras en rrnn
+TFG sobre la creación y experimentación de supermáscaras en rrnn. Progreso:
+
+- Tras intentar realizar el trabajo en pytorch descubrimos que no se pueden calcular gradientes von el loss de otra red, ya que el loss está conectado al grafo computacional de la otra red.
+- Intento hacer lo mismo en Keras, paro pasa lo mismo.
+- Esperando instrucciones.
 
 https://www.kaggle.com/c/digit-recognizer
 
