@@ -21,3 +21,12 @@ Cambiamos varianzas por 0,82 o por 1/0,82
 
 
 PROBLEMA: No se puede hacer una sola vez(varios experimentos para ver si tiene sentido con distintas inicializaciones)
+
+
+## Me lo vuelven a explicar
+
+Para cambiar las 
+
+Guardamos el loss en una lista y comparamos las 10 ultimas veces. Si 1/5 de las 10 ultimas veces, mejora o hay muchas mejoras -> estamos lejos de la solución -> aumentamos sigma x(1/0.82)
+
+Si hay muchas peoras -> Estamos cerca de la solución -> disminuimos sigma x(0.82)
