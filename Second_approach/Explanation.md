@@ -30,3 +30,21 @@ Para cambiar las
 Guardamos el loss en una lista y comparamos las 10 ultimas veces. Si 1/5 de las 10 ultimas veces, mejora o hay muchas mejoras -> estamos lejos de la solución -> aumentamos sigma x(1/0.82)
 
 Si hay muchas peoras -> Estamos cerca de la solución -> disminuimos sigma x(0.82)
+
+
+# Lógica programación
+- Definimos red
+- Definimos otra red y copiamos los pesos en una lista para tener nuestras varianzas
+- Sacamoos el dataset y lo separamos en train y test
+
+- Bucle:
+    - if epoch 1:
+        -Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
+        - Pasamos las imagenes por la red y sacamos el error. Lo guardamos en una lista
+    - else
+        - Guardo los pesos de la red y en la temp sumo las varianzas para cambiar los pesos
+        - Hago pruning en la temporal, propago, saco error y lo guardo en una lista
+        - Si +=mejoras que empeoramientos (lejos de solución):
+            - Lista varianzas * (1/0.82)
+        - Else (cerca sol):
+            - Lista varianzas * (0.82)
