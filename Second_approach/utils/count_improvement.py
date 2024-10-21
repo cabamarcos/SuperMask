@@ -11,7 +11,6 @@ def improvements(losses):
         elif losses[i] < losses[i+1]:
             peoras += 1
     
-    print(losses)
     if mejoras >= peoras:
         print("Mejoras")
         return 0
