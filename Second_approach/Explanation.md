@@ -1,35 +1,17 @@
 # Second approach notes
-Inicializamos una red aleatoria y un vector con el mismo numero de pesos pero con numeros grandes
-Podo la red un 70%, propago la red y saco el error.
+Inicializamos una red aleatoria y un vector de varianzas con el mismo numero de pesos.
 
-Con el error aplicamos la estrategia evolutiva 1+1 para calcular las nuevas varianzas.
-Aplicamos las varianzas para tener nuevos pesos.
+En las 9 primeras épocas:
+- Sumamos a cada peso de la red += normal(0,correspondiente varianza).
+- Hacemos pruning del 70% de los pesos más bajos.
+- Propagamos las imágenes y cogemos el error. Guardamos en lista.
+- Pasamos el conjunto de test para saber el accuracy. Guardamos en lista.
 
-Loss solo se usa para calcular las nuevas varianzas.
-
-## Estrategia evolutiva 1+1
-
-Vector con 10 unidades y 10 varianzas (asociadas a los pesos).
-- Obtenemos un nuevo vector (hacemos una normal 0 y la varianza).
-
-Hay que conseguir que converja a varianzas pequeñas (último resultado cerca de 0) -> Cambio de varianzas regla 1/5.
-- Guardo
-- Si más de 1/5 de las veces mejora -> lejos de la solución. Si mejora mucho en las últimas veces lejos de la sol.
-Si eso pasa, bajamos varianzas.
-
-Cambiamos varianzas por 0,82 o por 1/0,82
-
-
-PROBLEMA: No se puede hacer una sola vez(varios experimentos para ver si tiene sentido con distintas inicializaciones)
-
-
-## Me lo vuelven a explicar
-
-Para cambiar las 
-
-Guardamos el loss en una lista y comparamos las 10 ultimas veces. Si 1/5 de las 10 ultimas veces, mejora o hay muchas mejoras -> estamos lejos de la solución -> aumentamos sigma x(1/0.82)
-
-Si hay muchas peoras -> Estamos cerca de la solución -> disminuimos sigma x(0.82)
+En las siguientes igual hasta después del test en el que tenemos que comprobar una cosa:
+- Comprobamos los últimos 10 valores de la lista:
+    - Si mejora = 1/5 de las veces multiplicamos var * 1. (Lo dejamos igual)
+    - Si mejora < 1/5 de las veces estamos muy cerca de la solución por lo que disminuimos las varianzas multiplicando: var * 0.82.
+    - Si mejora > 1/5 de las veces estamos lejos de la solución por lo que aumentamos las varianzas multiplicando: var * (1/0.82).
 
 
 # Lógica programación
