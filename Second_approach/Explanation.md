@@ -49,11 +49,6 @@ Si hay muchas peoras -> Estamos cerca de la solución -> disminuimos sigma x(0.8
         - Else (cerca sol):
             - Lista varianzas * (0.82)
 
-# Poblemas a preguntár
-En el approach inicial habían dicho que si 1/5 de las veces mejoraba -> *1/0,82. Pero en esa idea puede mejorar y empeorar a la vez un numero de veces. 
-
-Qué pasaría si los ultimos 10 errores son 5 y 5 en cuanto a mejora y peora y se hace un bucle al mejorar y empeorar siempre. Estaríamos multilicando siempre por lo mismo y llegando siempre a los mismos pesos
-
 # Nueva reunión
 - No se suman las varianzas, hay que hacer una normal(0, var) ya que da un numero distinto cada vez y eso nos permite hacer 10 épocas con cambios ya que ese valor se suma a la red.
 - No se calcula la tasa de empeoramientos -> solo mejoras para las últimas 10 iteraciones:
