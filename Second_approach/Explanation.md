@@ -16,20 +16,25 @@ En las siguientes igual hasta después del test en el que tenemos que comprobar 
 
 # Lógica programación
 - Definimos red
-- Definimos otra red y copiamos los pesos en una lista para tener nuestras varianzas
+- Definimos otra red de varianzas.
 - Sacamoos el dataset y lo separamos en train y test
 
 - Bucle:
-    - if epoch 1:
-        -Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
-        - Pasamos las imagenes por la red y sacamos el error. Lo guardamos en una lista
+    - if epoch <= 9:
+        - Sumamos a cada peso de la red += normal(0,correspondiente varianza)
+        - Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
+        - Pasamos las imagenes por la red, sacamos error y guardamos en una lista. Sacamos el test acc y guardamos en otra lista.
     - else
-        - Guardo los pesos de la red y en la temp sumo las varianzas para cambiar los pesos
-        - Hago pruning en la temporal, propago, saco error y lo guardo en una lista
-        - Si +=mejoras que empeoramientos (lejos de solución):
-            - Lista varianzas * (1/0.82)
-        - Else (cerca sol):
-            - Lista varianzas * (0.82)
+        - Sumamos a cada peso de la red += normal(0,correspondiente varianza)
+        - Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
+        - Pasamos las imagenes por la red, sacamos error y guardamos en una lista. Sacamos el test acc y guardamos en otra lista.
+        - Comparamos cuantas mejoras hay en las 10 últimos valores de la lista
+        - Si en las últimas 10 losses hay < 1/5 de mejoras:
+            - Varianzas * 0.82
+        - elif hay = 1/5 mejoras:
+            - Varianzas * 1
+        - Else:
+            - varianzas * (1/0.82)
 
 # Nueva reunión
 - No se suman las varianzas, hay que hacer una normal(0, var) ya que da un numero distinto cada vez y eso nos permite hacer 10 épocas con cambios ya que ese valor se suma a la red.
