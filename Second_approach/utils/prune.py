@@ -11,7 +11,7 @@ def prune_weights(net):
     for name, module in new_net.named_modules():
         if isinstance(module, nn.Linear):
             weights = module.weight.data.cpu().numpy()
-            threshold = np.percentile(np.abs(weights), 70)
+            threshold = np.percentile(np.abs(weights), 50)
             weights[np.abs(weights) < threshold] = 0
             module.weight.data = torch.from_numpy(weights).to(device)
     return new_net
