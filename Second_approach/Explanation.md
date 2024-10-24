@@ -1,6 +1,9 @@
 # Second approach notes
 Inicializamos una red aleatoria y un vector de varianzas con el mismo numero de pesos.
 
+- Normalizamos los valores de la red entre 0 y 1 en cada iter
+- Normalizamos los valores de las var entre 0,9 y 1.
+
 En las 9 primeras épocas:
 - Sumamos a cada peso de la red += normal(0,correspondiente varianza).
 - Hacemos pruning del 70% de los pesos más bajos.
@@ -17,17 +20,32 @@ En las siguientes igual hasta después del test en el que tenemos que comprobar 
 # Lógica programación
 - Definimos red
 - Definimos otra red de varianzas.
-- Sacamoos el dataset y lo separamos en train y test
+- Sacamos el dataset y lo separamos en train y test
+
+- Normalizamos los valores de las var entre 0,9 y 1.
 
 - Bucle:
     - if epoch <= 9:
+        - Normalizamos los valores de la red entre 0 y 1.
         - Sumamos a cada peso de la red += normal(0,correspondiente varianza)
         - Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
-        - Pasamos las imagenes por la red, sacamos error y guardamos en una lista. Sacamos el test acc y guardamos en otra lista.
+        - Pasamos las imagenes por la red, sacamos error y test acc.
+        - if loss >= max(loss):
+            - net_dist.load(varied_net.disct)
+        - else:
+            pass
+        - Guardamos loss y acc en listas
     - else
+        - Normalizamos los valores de la red entre 0 y 1 en cada iter
+        - Normalizamos los valores de las var entre 0,9 y 1.
         - Sumamos a cada peso de la red += normal(0,correspondiente varianza)
         - Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
-        - Pasamos las imagenes por la red, sacamos error y guardamos en una lista. Sacamos el test acc y guardamos en otra lista.
+        - Pasamos las imagenes por la red, sacamos error y test acc.
+        - if loss >= max(loss):
+            - net_dist.load(varied_net.disct)
+        - else:
+            pass
+        - Guardamos loss y acc en listas
         - Comparamos cuantas mejoras hay en las 10 últimos valores de la lista
         - Si en las últimas 10 losses hay < 1/5 de mejoras:
             - Varianzas * 0.82
@@ -37,8 +55,8 @@ En las siguientes igual hasta después del test en el que tenemos que comprobar 
             - varianzas * (1/0.82)
 
 # Nueva reunión
-- No se suman las varianzas, hay que hacer una normal(0, var) ya que da un numero distinto cada vez y eso nos permite hacer 10 épocas con cambios ya que ese valor se suma a la red.
-- No se calcula la tasa de empeoramientos -> solo mejoras para las últimas 10 iteraciones:
-    - Si 2/10 de mejoras exactas -> var * 1
-    - Si < 1/5 de mejoras (muy cerca de la solución) -> var * 0.82
-    - Si > 1/5 de mejoras (muy lejos por lo que hay que hacer más grandes las varianzas) -> var *1/0.82
+Si da un buen resultado en loss (mejor que el mejor loss que haya habido hasta el momento) guardamos la red para que la prox iteración se haga con los pesos nuevos.
+
+Normalizar los datos:
+- red de 0 a 1
+- varianzas de 0.9 a 1
