@@ -60,3 +60,6 @@ Si da un buen resultado en loss (mejor que el mejor loss que haya habido hasta e
 Normalizar los datos:
 - red de 0 a 1
 - varianzas de 0.9 a 1
+
+# Resultados
+Aunque estamos haciendo lo que hemos pensado, la red que generamos se podría considerar como dummy, ya que está en torno al 10% de acierto con un dataset de 10 clases distintas. Alguna vez consigue en torno al 20%, pero esto no lo podemos considerar como un 
