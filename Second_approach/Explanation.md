@@ -62,4 +62,6 @@ Normalizar los datos:
 - varianzas de 0.9 a 1
 
 # Resultados
-Aunque estamos haciendo lo que hemos pensado, la red que generamos se podría considerar como dummy, ya que está en torno al 10% de acierto con un dataset de 10 clases distintas. Alguna vez consigue en torno al 20%, pero esto no lo podemos considerar como un 
+Aunque estamos haciendo lo que hemos pensado, la red que generamos se podría considerar como dummy, ya que está en torno al 10% de acierto con un dataset de 10 clases distintas. Alguna vez consigue en torno al 20%, pero esto no lo podemos considerar como un lottery ticket, aunque si entrenásemos estos modelos con prining, seguramente conseguiríamos muy buenos resultados.
+
+Los experimentos con cnn y pm con más capas no han surtido efecto aunque se hagan muchas épocas
