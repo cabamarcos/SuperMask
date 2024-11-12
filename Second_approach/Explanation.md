@@ -55,11 +55,7 @@ En las siguientes igual hasta después del test en el que tenemos que comprobar 
             - varianzas * (1/0.82)
 
 # Nueva reunión
-Si da un buen resultado en loss (mejor que el mejor loss que haya habido hasta el momento) guardamos la red para que la prox iteración se haga con los pesos nuevos.
-
-Normalizar los datos:
-- red de 0 a 1
-- varianzas de 0.9 a 1
+Hacer 10 épocas de aprendizaje entre individuos, volviendo al peso inicial al final dependiendo de los resultados. Si tras el aprendizaje, el resultado es mejor que el del mejor individuo, nos quedaremos con ese individuo.
 
 # Resultados
 Aunque estamos haciendo lo que hemos pensado, la red que generamos se podría considerar como dummy, ya que está en torno al 10% de acierto con un dataset de 10 clases distintas. Alguna vez consigue en torno al 20%, pero esto no lo podemos considerar como un lottery ticket, aunque si entrenásemos estos modelos con prining, seguramente conseguiríamos muy buenos resultados.
