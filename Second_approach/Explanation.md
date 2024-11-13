@@ -1,16 +1,13 @@
 # Second approach notes
-Inicializamos una red aleatoria y un vector de varianzas con el mismo numero de pesos.
-
-- Normalizamos los valores de la red entre 0 y 1 en cada iter
-- Normalizamos los valores de las var entre 0,9 y 1.
+Inicializamos una red aleatoria, un individuo y un vector de varianzas con el mismo numero de pesos.
 
 En las 9 primeras épocas:
-- Sumamos a cada peso de la red += normal(0,correspondiente varianza).
-- Hacemos pruning del 70% de los pesos más bajos.
-- Propagamos las imágenes y cogemos el error. Guardamos en lista.
+- Hacemos una máscara (pruning 70%) con el individuo sumandole la normal(0,varianza)
+- Aplicamos la mascara a la red.
+- Entrenamos a la red 10 epochs. Guardamos error (media o los 10).
 - Pasamos el conjunto de test para saber el accuracy. Guardamos en lista.
 
-En las siguientes igual hasta después del test en el que tenemos que comprobar una cosa:
+En las siguientes igual hasta después del test en el que tenemos que comprobar una cosa (1+1):
 - Comprobamos los últimos 10 valores de la lista:
     - Si mejora = 1/5 de las veces multiplicamos var * 1. (Lo dejamos igual)
     - Si mejora < 1/5 de las veces estamos muy cerca de la solución por lo que disminuimos las varianzas multiplicando: var * 0.82.
@@ -19,43 +16,48 @@ En las siguientes igual hasta después del test en el que tenemos que comprobar 
 
 # Lógica programación
 - Definimos red
+- Definimos un primer individuo y guardamo sus pesos.
 - Definimos otra red de varianzas.
 - Sacamos el dataset y lo separamos en train y test
 
-- Normalizamos los valores de las var entre 0,9 y 1.
+- Normalizamos los valores de las var. (no hace falta)
+
+- epoch = 1
 
 - Bucle:
-    - if epoch <= 9:
-        - Normalizamos los valores de la red entre 0 y 1.
-        - Sumamos a cada peso de la red += normal(0,correspondiente varianza)
-        - Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
-        - Pasamos las imagenes por la red, sacamos error y test acc.
-        - if loss >= max(loss):
-            - net_dist.load(varied_net.disct)
-        - else:
-            pass
-        - Guardamos loss y acc en listas
-    - else
-        - Normalizamos los valores de la red entre 0 y 1 en cada iter
-        - Normalizamos los valores de las var entre 0,9 y 1.
-        - Sumamos a cada peso de la red += normal(0,correspondiente varianza)
-        - Hacemos pruning en la red (temporal) y nos quedamos el 30% por capa.
-        - Pasamos las imagenes por la red, sacamos error y test acc.
-        - if loss >= max(loss):
-            - net_dist.load(varied_net.disct)
-        - else:
-            pass
-        - Guardamos loss y acc en listas
-        - Comparamos cuantas mejoras hay en las 10 últimos valores de la lista
-        - Si en las últimas 10 losses hay < 1/5 de mejoras:
-            - Varianzas * 0.82
-        - elif hay = 1/5 mejoras:
-            - Varianzas * 1
-        - Else:
-            - varianzas * (1/0.82)
+    - if epoch == 1: (primer individuo)
+        - Hacemos una máscara con el individuo (70%).
+        - Hacemos pruning en la red.
+        - Entrenamos la red 10 epocas
+        - Calculamos loss y acc y guardamos en listas.
+        - nuevo_ind = pesos(ind)+normal(0,var)
+        - epoch+=1
+
+    - else: (resto de individuos)
+        - Hacemos una máscara con el nuevo individuo (70%).
+        - Hacemos pruning en la red.
+        - Entrenamos la red 10 epocas
+        - Calculamos loss y acc y guardamos en listas.
+        - If loss[-1] < loss(ind):  (Verificamos si el nuevo ind da mejores resultados)
+            - ind_dist.load(nuevo_ind.disct)
+        - epoch += 1
+        - if epoch >=10:
+            - Comparamos cuantas mejoras hay en las 10 últimos valores de la lista
+            - Si en las últimas 10 losses hay < 1/5 de mejoras:
+                - Varianzas * 0.82
+            - elif hay = 1/5 mejoras:
+                - Varianzas * 1
+            - Else:
+                - varianzas * (1/0.82)
+        - nuevo_ind = pesos(ind)+normal(0,var)
 
 # Nueva reunión
-Hacer 10 épocas de aprendizaje entre individuos, volviendo al peso inicial al final dependiendo de los resultados. Si tras el aprendizaje, el resultado es mejor que el del mejor individuo, nos quedaremos con ese individuo.
+Me he dado cuenta que lo estoy haciendo mal. 
+- La red es siempre la misma.
+- Genero individuos con los que creo las máscaras (prune 70%)
+- entreno la red 10 epocas, guard loss y accuracy. 
+- genero otro individuo o me quedo el mismo dependiendo de los resultados
+- HAgo 1+1 (tengo que preguntar si sobre la media de los 10 ultimo sindividuos o como)
 
 # Resultados
 Aunque estamos haciendo lo que hemos pensado, la red que generamos se podría considerar como dummy, ya que está en torno al 10% de acierto con un dataset de 10 clases distintas. Alguna vez consigue en torno al 20%, pero esto no lo podemos considerar como un lottery ticket, aunque si entrenásemos estos modelos con prining, seguramente conseguiríamos muy buenos resultados.
