@@ -15,3 +15,28 @@ def prune_weights(net):
             weights[np.abs(weights) < threshold] = 0
             module.weight.data = torch.from_numpy(weights).to(device)
     return new_net
+
+def apply_mask(net, individuo):
+    """
+    Modifica los pesos de `net` usando una máscara basada en los pesos de `individuo`.
+    
+    Args:
+        net: Red neuronal en PyTorch cuyas conexiones serán ajustadas.
+        individuo: Red neuronal en PyTorch que se usará para calcular la máscara.
+    
+    Returns:
+        net: Red neuronal modificada según la máscara.
+    """
+    for (param_net, param_individuo) in zip(net.parameters(), individuo.parameters()):
+        # Obtiene los pesos de `individuo` en forma de un tensor
+        pesos_individuo = param_individuo.data.clone()
+        
+        # Calcula el percentil 70 para determinar el umbral
+        percent = torch.quantile(pesos_individuo.abs().flatten(), 0.7)
+        
+        # Crea la máscara: 1 donde el valor >= percentil_70, 0 donde < percentil_70
+        mascara = (pesos_individuo.abs() >= percent).float()
+
+        param_net.data = param_net.data * mascara
+
+    return net
