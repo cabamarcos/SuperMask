@@ -63,3 +63,22 @@ Me he dado cuenta que lo estoy haciendo mal.
 Aunque estamos haciendo lo que hemos pensado, la red que generamos se podría considerar como dummy, ya que está en torno al 10% de acierto con un dataset de 10 clases distintas. Alguna vez consigue en torno al 20%, pero esto no lo podemos considerar como un lottery ticket, aunque si entrenásemos estos modelos con prining, seguramente conseguiríamos muy buenos resultados.
 
 Los experimentos con cnn y pm con más capas no han surtido efecto aunque se hagan muchas épocas
+
+
+# Nueva reunión 
+## Forma de individuos.
+
+Las varianzas hay que inicializarlas de manera que los valores sean grandes. La idea es que el valor de las varianzas vaya bajando a medida que el modelo va "entrenando".
+
+## Forma de vectores binarios
+
+Vamos a generar "individos" en vez de con varianzas y cosas así, con vectores binarios de 0 y 1. 
+Tenemos que generar un vectro con un 30% de 1's que después de cada iteración, lo cambiamos cambiando el 5% de 1's a 0's y viceversa de forma aleatoria.
+
+Nos quedamos con el mejor individuo y variamos a partir del mejor ind.
+
+## Comparación
+
+Tenemos que comprobar que estrategia es mejor:
+
+Si esta estrategia (vect) me da un % tengo que intentar la forma anterior para ver si mejora la nueva. ENTRENANDO Y NO ENTRENANDO CON LOS DOS DATASETS.
