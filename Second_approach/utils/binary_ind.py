@@ -22,13 +22,13 @@ def make_to_binary(individuo):
             total_elements += binary_param.numel()
             total_ones += (binary_param == 1).sum().item()
 
-    # Calcula los porcentajes
-    percentage_ones = (total_ones / total_elements) * 100
-    percentage_zeros = 100 - percentage_ones
+    # # Calcula los porcentajes
+    # percentage_ones = (total_ones / total_elements) * 100
+    # percentage_zeros = 100 - percentage_ones
 
-    # Muestra el resultado
-    print(f"Porcentaje de 1s: {percentage_ones:.2f}%")
-    print(f"Porcentaje de 0s: {percentage_zeros:.2f}%")
+    # # Muestra el resultado
+    # print(f"Porcentaje de 1s: {percentage_ones:.2f}%")
+    # print(f"Porcentaje de 0s: {percentage_zeros:.2f}%")
     
     return individuo
 
@@ -101,15 +101,15 @@ def modify_weights(network):
         current_idx += numel
 
 
-    #imprimir porcentaje de 1s y 0s
-    ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
+    # #imprimir porcentaje de 1s y 0s
+    # ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
+    # zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
 
-    total_weights = weights.numel()
-    total_ones = len(ones_indices)
-    total_zeros = len(zeros_indices)
+    # total_weights = weights.numel()
+    # total_ones = len(ones_indices)
+    # total_zeros = len(zeros_indices)
 
-    print(f"Porcentaje de 1s: {total_ones / total_weights * 100:.2f}%")
-    print(f"Porcentaje de 0s: {total_zeros / total_weights * 100:.2f}%")
+    # print(f"Porcentaje de 1s: {total_ones / total_weights * 100:.2f}%")
+    # print(f"Porcentaje de 0s: {total_zeros / total_weights * 100:.2f}%")
 
     return network
