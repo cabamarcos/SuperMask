@@ -32,7 +32,7 @@ def apply_mask(net, individuo):
         pesos_individuo = param_individuo.data.clone()
         
         # Calcula el percentil 70 para determinar el umbral
-        percent = torch.quantile(pesos_individuo.abs().flatten(), 0.7)
+        percent = torch.quantile(pesos_individuo.abs().flatten(), 0.9)
         
         # Crea la máscara: 1 donde el valor >= percentil_70, 0 donde < percentil_70
         mascara = (pesos_individuo.abs() >= percent).float()
