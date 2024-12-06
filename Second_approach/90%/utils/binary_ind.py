@@ -7,8 +7,8 @@ def make_to_binary(individuo):
 
     for name, param in individuo.named_parameters():
         if "weight" in name or "bias" in name:
-            # Calcula el percentil 30 directamente sobre los valores de los parámetros
-            threshold = param.quantile(0.7)
+            # Calcula el percentil 10 directamente sobre los valores de los parámetros
+            threshold = param.quantile(0.9)
 
             # Binariza: 1 para valores mayores al percentil 30, 0 para los demás
             binary_param = torch.where(param > threshold, 
@@ -35,8 +35,8 @@ def make_to_binary(individuo):
 
 def modify_weights(network):
     """
-    Modifica aleatoriamente el 5% de los pesos de 1 a 0 y el 5% de los pesos de 0 a 1,
-    manteniendo el 30% de 1s y el 70% de 0s en la red.
+    Modifica aleatoriamente el 2% de los pesos de 1 a 0 y el 2% de los pesos de 0 a 1,
+    manteniendo el 10% de 1s y el 90% de 0s en la red.
 
     Args:
         network (torch.nn.Module): Red con pesos que consisten en 1s y 0s.
@@ -56,12 +56,12 @@ def modify_weights(network):
     total_ones = len(ones_indices)
     total_zeros = len(zeros_indices)
 
-    assert abs(total_ones / total_weights - 0.3) < 0.01, "La red inicial no tiene aproximadamente el 30% de pesos = 1."
-    assert abs(total_zeros / total_weights - 0.7) < 0.01, "La red inicial no tiene aproximadamente el 70% de pesos = 0."
+    assert abs(total_ones / total_weights - 0.1) < 0.01, "La red inicial no tiene aproximadamente el 30% de pesos = 1."
+    assert abs(total_zeros / total_weights - 0.9) < 0.01, "La red inicial no tiene aproximadamente el 70% de pesos = 0."
 
     # Calcular el número exacto de cambios necesarios para mantener la proporción
-    num_to_flip_1_to_0 = int(0.05 * total_weights)
-    num_to_flip_0_to_1 = int(0.05 * total_weights)
+    num_to_flip_1_to_0 = int(0.02 * total_weights)
+    num_to_flip_0_to_1 = int(0.02 * total_weights)
 
     # Seleccionar índices aleatorios para los cambios
     flip_1_to_0_indices = random.sample(list(ones_indices.cpu().numpy()), num_to_flip_1_to_0)
@@ -79,7 +79,7 @@ def modify_weights(network):
     total_ones = len(ones_indices)
     total_zeros = len(zeros_indices)
 
-    target_ones = int(0.3 * total_weights)
+    target_ones = int(0.1 * total_weights)
     target_zeros = total_weights - target_ones
 
     if total_ones > target_ones:

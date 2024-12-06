@@ -11,7 +11,7 @@ def prune_weights(net):
     for name, module in new_net.named_modules():
         if isinstance(module, nn.Linear):
             weights = module.weight.data.cpu().numpy()
-            threshold = np.percentile(np.abs(weights), 70)
+            threshold = np.percentile(np.abs(weights), 90)
             weights[np.abs(weights) < threshold] = 0
             module.weight.data = torch.from_numpy(weights).to(device)
     return new_net
@@ -31,10 +31,10 @@ def apply_mask(net, individuo):
         # Obtiene los pesos de `individuo` en forma de un tensor
         pesos_individuo = param_individuo.data.clone()
         
-        # Calcula el percentil 70 para determinar el umbral
+        # Calcula el percentil 90 para determinar el umbral
         percent = torch.quantile(pesos_individuo.abs().flatten(), 0.9)
         
-        # Crea la máscara: 1 donde el valor >= percentil_70, 0 donde < percentil_70
+        # Crea la máscara: 1 donde el valor >= percentil_90, 0 donde < percentil_90
         mascara = (pesos_individuo.abs() >= percent).float()
 
         param_net.data = param_net.data * mascara
