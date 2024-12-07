@@ -35,81 +35,120 @@ def make_to_binary(individuo):
 
 def modify_weights(network):
     """
-    Modifica aleatoriamente el 2% de los pesos de 1 a 0 y el 2% de los pesos de 0 a 1,
-    manteniendo el 10% de 1s y el 90% de 0s en la red.
-
+    Modifica la red asegurando que los pesos binarizados siempre mantengan un 10% de activación.
+    
     Args:
-        network (torch.nn.Module): Red con pesos que consisten en 1s y 0s.
-
+        network (torch.nn.Module): Red con pesos binarizados (1s y 0s).
+        
     Returns:
-        torch.nn.Module: Red modificada con los cambios aplicados.
+        torch.nn.Module: Red modificada con exactamente el 10% de activación.
     """
-    # Convertir los pesos a un tensor plano
     with torch.no_grad():
-        weights = torch.flatten(torch.cat([p.flatten() for p in network.parameters()]))
+        # Convertir los pesos a un tensor plano
+        weights = torch.cat([param.flatten() for param in network.parameters()]).clone()
 
-    # Verificar distribución inicial
-    ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
+        # Total de pesos y objetivo del 10%
+        total_weights = weights.numel()
+        target_ones = int(0.1 * total_weights)  # Queremos exactamente el 10%
 
-    total_weights = weights.numel()
-    total_ones = len(ones_indices)
-    total_zeros = len(zeros_indices)
+        # Identificar índices de unos y ceros
+        ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
+        zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
 
-    assert abs(total_ones / total_weights - 0.1) < 0.01, "La red inicial no tiene aproximadamente el 30% de pesos = 1."
-    assert abs(total_zeros / total_weights - 0.9) < 0.01, "La red inicial no tiene aproximadamente el 70% de pesos = 0."
+        # Modificar aleatoriamente un 2% de los pesos
+        num_to_flip_1_to_0 = min(len(ones_indices), int(0.02 * total_weights))
+        num_to_flip_0_to_1 = min(len(zeros_indices), int(0.02 * total_weights))
 
-    # Calcular el número exacto de cambios necesarios para mantener la proporción
-    num_to_flip_1_to_0 = int(0.02 * total_weights)
-    num_to_flip_0_to_1 = int(0.02 * total_weights)
+        # Convertir 1s a 0s y 0s a 1s
+        if num_to_flip_1_to_0 > 0:
+            flip_1_to_0_indices = random.sample(list(ones_indices.cpu().numpy()), num_to_flip_1_to_0)
+            weights[flip_1_to_0_indices] = 0
+        if num_to_flip_0_to_1 > 0:
+            flip_0_to_1_indices = random.sample(list(zeros_indices.cpu().numpy()), num_to_flip_0_to_1)
+            weights[flip_0_to_1_indices] = 1
 
-    # Seleccionar índices aleatorios para los cambios
-    flip_1_to_0_indices = random.sample(list(ones_indices.cpu().numpy()), num_to_flip_1_to_0)
-    flip_0_to_1_indices = random.sample(list(zeros_indices.cpu().numpy()), num_to_flip_0_to_1)
+        # Ajustar para garantizar exactamente el 10% de activación
+        ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
+        zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
 
-    # Realizar los cambios
-    weights[flip_1_to_0_indices] = 0
-    weights[flip_0_to_1_indices] = 1
+        # Calcular exceso o déficit de unos
+        current_ones = len(ones_indices)
+        excess_ones = current_ones - target_ones
 
-    # Ajustar la proporción si es necesario
-    # Recalcular índices después de los cambios
-    ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
+        if excess_ones > 0:
+            # Demasiados 1s: convertir el exceso a 0s
+            flip_indices = random.sample(list(ones_indices.cpu().numpy()), excess_ones)
+            weights[flip_indices] = 0
+        elif excess_ones < 0:
+            # Faltan 1s: convertir ceros adicionales a 1s
+            flip_indices = random.sample(list(zeros_indices.cpu().numpy()), -excess_ones)
+            weights[flip_indices] = 1
 
-    total_ones = len(ones_indices)
-    total_zeros = len(zeros_indices)
-
-    target_ones = int(0.1 * total_weights)
-    target_zeros = total_weights - target_ones
-
-    if total_ones > target_ones:
-        # Demasiados 1s: convertir el exceso a 0s
-        excess_ones = total_ones - target_ones
-        excess_indices = random.sample(list(ones_indices.cpu().numpy()), excess_ones)
-        weights[excess_indices] = 0
-    elif total_zeros > target_zeros:
-        # Demasiados 0s: convertir el exceso a 1s
-        excess_zeros = total_zeros - target_zeros
-        excess_indices = random.sample(list(zeros_indices.cpu().numpy()), excess_zeros)
-        weights[excess_indices] = 1
-
-    # Restaurar los pesos modificados en la red
-    current_idx = 0
-    for param in network.parameters():
-        numel = param.numel()
-        param.data.copy_(weights[current_idx:current_idx + numel].view_as(param))
-        current_idx += numel
-
-
-    # #imprimir porcentaje de 1s y 0s
-    # ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    # zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
-
-    # total_weights = weights.numel()
-    # total_ones = len(ones_indices)
-    # total_zeros = len(zeros_indices)
-
-    # print(f"Porcentaje de 1s: {total_ones / total_weights * 100:.2f}%")
-    # print(f"Porcentaje de 0s: {total_zeros / total_weights * 100:.2f}%")
+        # Restaurar los pesos modificados en la red
+        current_idx = 0
+        for param in network.parameters():
+            numel = param.numel()
+            param.data.copy_(weights[current_idx:current_idx + numel].view_as(param))
+            current_idx += numel
 
     return network
+
+
+import torch
+import random
+
+# Red de prueba
+class TestNetwork(torch.nn.Module):
+    def __init__(self, size=1000):
+        super(TestNetwork, self).__init__()
+        self.layer1 = torch.nn.Linear(size, size)
+        self.layer2 = torch.nn.Linear(size, size)
+
+network = TestNetwork()
+
+# Función para verificar proporción de 1s
+def check_proportion(network, target_percentage=10.0):
+    total_params = 0
+    active_params = 0
+    with torch.no_grad():
+        for param in network.parameters():
+            total_params += param.numel()
+            active_params += (param == 1).sum().item()
+    active_percentage = (active_params / total_params) * 100
+    return active_percentage
+
+# Bucle para probar
+iterations = 10
+print("Proporciones iniciales de 1s antes de modificar:")
+print(f"Iteración inicial: {check_proportion(network):.2f}% de pesos activos")
+
+for i in range(1, iterations + 1):
+    # Inicializar red
+    network = TestNetwork()
+    network = make_to_binary(network)  # Convertimos a binario
+    network = modify_weights(network)  # Aplicamos la función de modificación
+    active_percentage = check_proportion(network)
+    print(f"Iteración {i}: {active_percentage:.2f}% de pesos activos")
+    assert abs(active_percentage - 10.0) < 0.01, f"Error: proporción fuera del rango permitido en la iteración {i}"
+
+
+def apply_mask_binary(net, individuo):
+    """
+    Modifica los pesos de `net` usando una máscara basada en los pesos de `individuo`.
+    
+    Args:
+        net: Red neuronal en PyTorch cuyas conexiones serán ajustadas.
+        individuo: Red neuronal en PyTorch que se usará para calcular la máscara.
+    
+    Returns:
+        net: Red neuronal modificada según la máscara.
+    """
+    for (param_net, param_individuo) in zip(net.parameters(), individuo.parameters()):
+        # Asumimos que `param_individuo` es binario, donde 1 indica un peso activo y 0 un peso inactivo.
+        # Crea la máscara directamente a partir de `param_individuo`.
+        mascara = param_individuo.data.clone()
+
+        # Aplica la máscara a los pesos de `net`.
+        param_net.data = param_net.data * mascara
+
+    return net
