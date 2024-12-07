@@ -8,7 +8,7 @@ def make_to_binary(individuo):
     for name, param in individuo.named_parameters():
         if "weight" in name or "bias" in name:
             # Calcula el percentil 30 directamente sobre los valores de los parámetros
-            threshold = param.quantile(0.9)
+            threshold = param.quantile(0.7)
 
             # Binariza: 1 para valores mayores al percentil 30, 0 para los demás
             binary_param = torch.where(param > threshold, 
@@ -21,95 +21,87 @@ def make_to_binary(individuo):
             # Actualiza contadores
             total_elements += binary_param.numel()
             total_ones += (binary_param == 1).sum().item()
-
-    # # Calcula los porcentajes
-    # percentage_ones = (total_ones / total_elements) * 100
-    # percentage_zeros = 100 - percentage_ones
-
-    # # Muestra el resultado
-    # print(f"Porcentaje de 1s: {percentage_ones:.2f}%")
-    # print(f"Porcentaje de 0s: {percentage_zeros:.2f}%")
     
     return individuo
 
 
 def modify_weights(network):
     """
-    Modifica aleatoriamente el 5% de los pesos de 1 a 0 y el 5% de los pesos de 0 a 1,
-    manteniendo el 30% de 1s y el 70% de 0s en la red.
-
+    Modifica la red asegurando que los pesos binarizados siempre mantengan un 10% de activación.
+    
     Args:
-        network (torch.nn.Module): Red con pesos que consisten en 1s y 0s.
-
+        network (torch.nn.Module): Red con pesos binarizados (1s y 0s).
+        
     Returns:
-        torch.nn.Module: Red modificada con los cambios aplicados.
+        torch.nn.Module: Red modificada con exactamente el 10% de activación.
     """
-    # Convertir los pesos a un tensor plano
     with torch.no_grad():
-        weights = torch.flatten(torch.cat([p.flatten() for p in network.parameters()]))
+        # Convertir los pesos a un tensor plano
+        weights = torch.cat([param.flatten() for param in network.parameters()]).clone()
 
-    # Verificar distribución inicial
-    ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
+        # Total de pesos y objetivo del 30%
+        total_weights = weights.numel()
+        target_ones = int(0.3 * total_weights)  # Queremos exactamente el 30%
 
-    total_weights = weights.numel()
-    total_ones = len(ones_indices)
-    total_zeros = len(zeros_indices)
+        # Identificar índices de unos y ceros
+        ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
+        zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
 
-    assert abs(total_ones / total_weights - 0.1) < 0.01, "La red inicial no tiene aproximadamente el 10% de pesos = 1."
-    assert abs(total_zeros / total_weights - 0.9) < 0.01, "La red inicial no tiene aproximadamente el 90% de pesos = 0."
+        # Modificar aleatoriamente un 5% de los pesos
+        num_to_flip_1_to_0 = min(len(ones_indices), int(0.05 * total_weights))
+        num_to_flip_0_to_1 = min(len(zeros_indices), int(0.05 * total_weights))
 
-    # Calcular el número exacto de cambios necesarios para mantener la proporción
-    num_to_flip_1_to_0 = int(0.02 * total_weights)
-    num_to_flip_0_to_1 = int(0.02 * total_weights)
+        # Convertir 1s a 0s y 0s a 1s
+        if num_to_flip_1_to_0 > 0:
+            flip_1_to_0_indices = random.sample(list(ones_indices.cpu().numpy()), num_to_flip_1_to_0)
+            weights[flip_1_to_0_indices] = 0
+        if num_to_flip_0_to_1 > 0:
+            flip_0_to_1_indices = random.sample(list(zeros_indices.cpu().numpy()), num_to_flip_0_to_1)
+            weights[flip_0_to_1_indices] = 1
 
-    # Seleccionar índices aleatorios para los cambios
-    flip_1_to_0_indices = random.sample(list(ones_indices.cpu().numpy()), num_to_flip_1_to_0)
-    flip_0_to_1_indices = random.sample(list(zeros_indices.cpu().numpy()), num_to_flip_0_to_1)
+        # Ajustar para garantizar exactamente el 30% de activación
+        ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
+        zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
 
-    # Realizar los cambios
-    weights[flip_1_to_0_indices] = 0
-    weights[flip_0_to_1_indices] = 1
+        # Calcular exceso o déficit de unos
+        current_ones = len(ones_indices)
+        excess_ones = current_ones - target_ones
 
-    # Ajustar la proporción si es necesario
-    # Recalcular índices después de los cambios
-    ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
+        if excess_ones > 0:
+            # Demasiados 1s: convertir el exceso a 0s
+            flip_indices = random.sample(list(ones_indices.cpu().numpy()), excess_ones)
+            weights[flip_indices] = 0
+        elif excess_ones < 0:
+            # Faltan 1s: convertir ceros adicionales a 1s
+            flip_indices = random.sample(list(zeros_indices.cpu().numpy()), -excess_ones)
+            weights[flip_indices] = 1
 
-    total_ones = len(ones_indices)
-    total_zeros = len(zeros_indices)
-
-    target_ones = int(0.1 * total_weights)
-    target_zeros = total_weights - target_ones
-
-    if total_ones > target_ones:
-        # Demasiados 1s: convertir el exceso a 0s
-        excess_ones = total_ones - target_ones
-        excess_indices = random.sample(list(ones_indices.cpu().numpy()), excess_ones)
-        weights[excess_indices] = 0
-    elif total_zeros > target_zeros:
-        # Demasiados 0s: convertir el exceso a 1s
-        excess_zeros = total_zeros - target_zeros
-        excess_indices = random.sample(list(zeros_indices.cpu().numpy()), excess_zeros)
-        weights[excess_indices] = 1
-
-    # Restaurar los pesos modificados en la red
-    current_idx = 0
-    for param in network.parameters():
-        numel = param.numel()
-        param.data.copy_(weights[current_idx:current_idx + numel].view_as(param))
-        current_idx += numel
-
-
-    # #imprimir porcentaje de 1s y 0s
-    # ones_indices = (weights == 1).nonzero(as_tuple=True)[0]
-    # zeros_indices = (weights == 0).nonzero(as_tuple=True)[0]
-
-    # total_weights = weights.numel()
-    # total_ones = len(ones_indices)
-    # total_zeros = len(zeros_indices)
-
-    # print(f"Porcentaje de 1s: {total_ones / total_weights * 100:.2f}%")
-    # print(f"Porcentaje de 0s: {total_zeros / total_weights * 100:.2f}%")
+        # Restaurar los pesos modificados en la red
+        current_idx = 0
+        for param in network.parameters():
+            numel = param.numel()
+            param.data.copy_(weights[current_idx:current_idx + numel].view_as(param))
+            current_idx += numel
 
     return network
+
+def apply_mask_binary(net, individuo):
+    """
+    Modifica los pesos de `net` usando una máscara basada en los pesos de `individuo`.
+    
+    Args:
+        net: Red neuronal en PyTorch cuyas conexiones serán ajustadas.
+        individuo: Red neuronal en PyTorch que se usará para calcular la máscara.
+    
+    Returns:
+        net: Red neuronal modificada según la máscara.
+    """
+    for (param_net, param_individuo) in zip(net.parameters(), individuo.parameters()):
+        # Asumimos que `param_individuo` es binario, donde 1 indica un peso activo y 0 un peso inactivo.
+        # Crea la máscara directamente a partir de `param_individuo`.
+        mascara = param_individuo.data.clone()
+
+        # Aplica la máscara a los pesos de `net`.
+        param_net.data = param_net.data * mascara
+
+    return net
