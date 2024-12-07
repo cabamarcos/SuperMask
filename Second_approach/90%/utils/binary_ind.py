@@ -93,45 +93,6 @@ def modify_weights(network):
 
     return network
 
-
-import torch
-import random
-
-# Red de prueba
-class TestNetwork(torch.nn.Module):
-    def __init__(self, size=1000):
-        super(TestNetwork, self).__init__()
-        self.layer1 = torch.nn.Linear(size, size)
-        self.layer2 = torch.nn.Linear(size, size)
-
-network = TestNetwork()
-
-# Función para verificar proporción de 1s
-def check_proportion(network, target_percentage=10.0):
-    total_params = 0
-    active_params = 0
-    with torch.no_grad():
-        for param in network.parameters():
-            total_params += param.numel()
-            active_params += (param == 1).sum().item()
-    active_percentage = (active_params / total_params) * 100
-    return active_percentage
-
-# Bucle para probar
-iterations = 10
-print("Proporciones iniciales de 1s antes de modificar:")
-print(f"Iteración inicial: {check_proportion(network):.2f}% de pesos activos")
-
-for i in range(1, iterations + 1):
-    # Inicializar red
-    network = TestNetwork()
-    network = make_to_binary(network)  # Convertimos a binario
-    network = modify_weights(network)  # Aplicamos la función de modificación
-    active_percentage = check_proportion(network)
-    print(f"Iteración {i}: {active_percentage:.2f}% de pesos activos")
-    assert abs(active_percentage - 10.0) < 0.01, f"Error: proporción fuera del rango permitido en la iteración {i}"
-
-
 def apply_mask_binary(net, individuo):
     """
     Modifica los pesos de `net` usando una máscara basada en los pesos de `individuo`.
