@@ -82,3 +82,27 @@ Nos quedamos con el mejor individuo y variamos a partir del mejor ind.
 Tenemos que comprobar que estrategia es mejor:
 
 Si esta estrategia (vect) me da un % tengo que intentar la forma anterior para ver si mejora la nueva. ENTRENANDO Y NO ENTRENANDO CON LOS DOS DATASETS.
+
+# Resultados
+
+| Porcentaje | Tipo        | Modelo            | Loss mínima | Época | % Máx de Acc | Época |
+|------------|-------------|-------------------|-------------|-------|--------------|-------|
+| **70%**    | Binarios    | Normal            | 2.299269    | 160   | 0.1624       | 118   |
+|            |             | Entrenado-MNIST   | 0.163453    | 1     | 0.9888       | 153   |
+|            |             | Entrenado-CIFAR10 | 1.477188    | 2     | 0.5861       | 4     |
+|            | No binarios | Normal            | 2.300360    | 29    | 0.1448       | 113   |
+|            |             | Entrenado-MNIST   | 0.166901    | 1     | 0.9895       | 153   |
+|            |             | Entrenado-CIFAR10 | 1.470706    | 3     | 0.5941       | 3     |
+| **90%**    | Binarios    | Normal            | 2.301484    | 189   | 0.1861       | 57    |
+|            |             | Entrenado-MNIST   | 0.202030    | 1     | 0.9873       | 129   |
+|            |             | Entrenado-CIFAR10 | 1.545169    | 2     | 0.5626       | 2     |
+|            | No binarios | Normal            | 2.301926    | 17    | 0.1984       | 103   |
+|            |             | Entrenado-MNIST   | 0.178277    | 1     | 0.9876       | 1     |
+|            |             | Entrenado-CIFAR10 | 1.522111    | 4     | 0.5762       | 4     |
+| **95%**    | Binarios    | Normal            | 2.302046    | 124   | 0.1882       | 192   |
+|            |             | Entrenado-MNIST   | 0.221937    | 2     | 0.9861       | 23    |
+|            |             | Entrenado-CIFAR10 | 1.601032    | 2     | 0.5422       | 4     |
+|            | No binarios | Normal            | 2.302348    | 299   | 0.2035       | 219   |
+|            |             | Entrenado-MNIST   | 0.196623    | 2     | 0.9867       | 210   |
+|            |             | Entrenado-CIFAR10 | 1.558575    | 2     | 0.5404       | 4     |
+
