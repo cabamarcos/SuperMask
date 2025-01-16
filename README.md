@@ -14,3 +14,12 @@ https://www.kaggle.com/code/yassineghouzam/introduction-to-cnn-keras-0-997-top-6
 https://www.kaggle.com/code/faressayah/cifar-10-images-classification-using-cnns-88
 
 https://www.kaggle.com/code/sciencelabwork/cifar-10-with-resnet50-transfer-learning
+
+- Memoria
+metodoilogía. justificar los experimentos segun si sirve o si no
+
+entorno experimentañl
+experimentos
+evaluacion de los experimentos y conclusiones
+
+
