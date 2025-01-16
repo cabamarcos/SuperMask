@@ -15,11 +15,11 @@ https://www.kaggle.com/code/faressayah/cifar-10-images-classification-using-cnns
 
 https://www.kaggle.com/code/sciencelabwork/cifar-10-with-resnet50-transfer-learning
 
-- Memoria
-metodoilogía. justificar los experimentos segun si sirve o si no
+- Memoria:
+Metodoilogía: justificar los experimentos segun si sirve o si no.
 
-entorno experimentañl
-experimentos
-evaluacion de los experimentos y conclusiones
+Entorno experimental
 
+Experimentos
 
+Evaluacion de los experimentos y conclusiones
