@@ -23,3 +23,11 @@ Entorno experimental
 Experimentos
 
 Evaluacion de los experimentos y conclusiones
+
+
+
+Para la memoria tengo que explicar primero lo que he hecho para probar el lth
+
+Luego explicamos los algoritmos evolutivos
+
+Si puedo más de 100 páginas
