@@ -8,10 +8,3 @@ In this approach we will try to do this:
 5. Back-propagate that loss through the un-pruned mask and update the new weights.
 6. Test the results after each epoch with the pruned net.
 7. Repeat 2-6 with the un-pruned mask and net.
-
-
-## Conclussion
-
-This might work in theory because in each epoch we will have new weights in mask, making the pruning of the net different each time. This can make us find a supermask where the results are higher, making all the costly process of training a big RNN less costly. (LTH)
-
-After tying to code it with Pytorch and Tensorflow I figured out it couldn't be implemented, as you can't use the value of the loss of the net and back propagate in the mask. 
