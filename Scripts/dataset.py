@@ -1,7 +1,7 @@
 import os
 import shutil
 import random
-from translate import translate
+from Scripts.translate import translate
 
 # Rutas
 base_path = "./animals10"
