@@ -1,8 +1,5 @@
-Como no hemos conseguido resultados, vamos a probar la lth como en el paper para ver si estamos haciendo algo mal
+# Proving LTH
 
+In this folder we are trying to prove the existence of lottery tickets for the architectures and datasets we want to exeperiment later on. 
 
-Para ello inicializamos una red y entrenamos cifar 
-
-Probar con un dataset de imágenes más grande que me va a pasar y alexnet para ver los resultados.
-
-con la mejor máscara probar un aprendizaje muy largo para ver si puedo obtener un mayor % de acc en el mismo tiempo que la origunal con el 100% de pesos
+We will also compare the results of this experiment with the experiments done in the folder ./1. Initial resolutions to see if lottery tickets with different levels of sparsity can have better performance than a fully trained net.
