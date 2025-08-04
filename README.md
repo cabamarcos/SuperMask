@@ -1,12 +1,14 @@
 # SuperMask — UC3M Final Degree Project
 
 > **Author:** Marcos Caballero Cortés
+
 > **Degree:** BSc in Computer Science  
+
 > **University:** Universidad Carlos III de Madrid (UC3M)
 
 ---
 
-## 📘 Overview
+## Overview
 
 **SuperMask** is a research project exploring evolutionary algorithms in deep neural networks to search for Supermasks.
 
@@ -14,7 +16,7 @@ This repository includes experimental code and results developed as part of a **
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 SuperMask/
@@ -39,7 +41,7 @@ SuperMask/
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 We recommend using a virtual environment.
 
@@ -55,7 +57,7 @@ pip install -r requirements.txt
 ```
 ---
 
-## 🚀 How to Run Experiments
+## How to Run Experiments
 
 All training and evaluation scripts are inside the folder of each experimental phase. 
 
@@ -68,13 +70,13 @@ The notebooks are self-contained and can be executed step-by-step from within th
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](./LICENSE).
 
 ---
 
-## 📬 Contact
+## Contact
 
 For questions, suggestions, or collaborations:
 
