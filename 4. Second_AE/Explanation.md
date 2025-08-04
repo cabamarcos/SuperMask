@@ -1,8 +1,8 @@
 # Second approach notes
-Inicializamos una red aleatoria, un individuo y un vector de varianzas con el mismo numero de pesos.
+Inicializamos una red aleatoria, un individuo y un vector de varianzas con el mismo numero de pesos (misma arquitectura de red).
 
-En las 9 primeras épocas:
-- Hacemos una máscara (pruning 70%) con el individuo sumandole la normal(0,varianza)
+En las 10 primeras épocas:
+- Hacemos una máscara (pruning 70% de los pesos mas bajos(es decir, nos quedamos con el 30% de pesos mas altos en valor abs)) con el individuo habiendole sumado la normal(0,varianza)
 - Aplicamos la mascara a la red.
 - Entrenamos a la red 10 epochs. Guardamos error (media o los 10).
 - Pasamos el conjunto de test para saber el accuracy. Guardamos en lista.
