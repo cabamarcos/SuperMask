@@ -1,4 +1,11 @@
-torch
-torchvision
-numpy
-matplotlib
+torch==2.7.0
+torchvision==0.22.0
+
+numpy==1.26.4
+matplotlib==3.9.2
+
+Pillow==10.4.0
+
+jupyter>=1.0.0
+ipykernel>=6.0.0
+nbformat>=5.0.0
