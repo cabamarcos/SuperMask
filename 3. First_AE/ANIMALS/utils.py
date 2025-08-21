@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
+from torchvision import models
+
 import copy
 
 class MaskedForward(nn.Module):
@@ -43,3 +46,48 @@ class MaskedForward(nn.Module):
                 out = n_layer(out)
 
         return out
+
+def restart_training(device):
+    """Función para reinicializar net, mask y métricas"""
+    global net, mask, optimizer, epoch, losses, accuracies, saved, restart_count
+    
+    restart_count += 1
+    print("Reinicializando net y máscara, y reiniciando el entrenamiento...")
+    
+    net = models.alexnet(pretrained=False)
+    net.classifier[6] = nn.Linear(net.classifier[6].in_features, 10)
+    net.to(device)
+    
+    # Congelar los parámetros de net
+    for param in net.parameters():
+        param.requires_grad = False
+    
+    mask = models.alexnet(pretrained=False)
+    mask.classifier[6] = nn.Linear(mask.classifier[6].in_features, 10)
+    mask.to(device)
+    
+    optimizer = optim.Adam(mask.parameters(), lr=0.001)
+    
+    epoch = 0
+    losses = []
+    accuracies = []
+    saved = False
+
+def check_restart_conditions(restart_checks, device):
+    """Verifica todas las condiciones de reinicio usando el diccionario de configuración"""
+    current_max_accuracy = max(accuracies) if accuracies else 0
+    
+    for check_epoch, config in restart_checks.items():
+        min_acc = config["accuracy"] * 100
+        restart_type = config["message"]
+        
+        # Para época 70, verificar si es mayor o igual; para otras, verificar igualdad exacta
+        should_check = (epoch == check_epoch) or (check_epoch == 70 and epoch >= check_epoch)
+        
+        if should_check and current_max_accuracy < min_acc:
+            print(f"\n!!! {restart_type} {restart_count + 1} !!!")
+            print(f"No se alcanzó {min_acc}% de accuracy en época {check_epoch}.")
+            restart_training(device)
+            return True
+    
+    return False
