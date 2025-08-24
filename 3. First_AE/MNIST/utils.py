@@ -12,12 +12,16 @@ class MaskedForward(nn.Module):
 
     def _binary_mask(self, scores):
         k = int((1.0 - self.sparsity) * scores.numel())
+        if k <= 0:
+            return torch.zeros_like(scores)
+        if k >= scores.numel():
+            return torch.ones_like(scores)
         threshold = torch.kthvalue(scores.flatten(), k).values
         hard_mask = (scores > threshold).float()
         return hard_mask + (scores - scores.detach())  # STE: binarized forward, gradient passthrough
 
     def forward(self, x):
-        # Check if the model has features and classifier (AlexNet)
+        # Check if the model has features and classifier (AlexNet style)
         if hasattr(self.net, 'features') and hasattr(self.net, 'classifier'):
             # AlexNet-style forward pass
             out = x
@@ -25,7 +29,7 @@ class MaskedForward(nn.Module):
                 if isinstance(n_layer, nn.Conv2d):
                     mask_scores = m_layer.weight.abs()
                     mask_bin = self._binary_mask(mask_scores)
-                    binary_mask = mask_bin + (mask_scores - mask_scores)
+                    binary_mask = mask_bin + (mask_scores - mask_scores.detach())
                     masked_weight = n_layer.weight * binary_mask
                     out = F.conv2d(out, masked_weight, n_layer.bias, stride=n_layer.stride, padding=n_layer.padding)
                 else:
@@ -37,7 +41,7 @@ class MaskedForward(nn.Module):
                 if isinstance(n_layer, nn.Linear):
                     mask_scores = m_layer.weight.abs()
                     mask_bin = self._binary_mask(mask_scores)
-                    binary_mask = mask_bin + (mask_scores - mask_scores)
+                    binary_mask = mask_bin + (mask_scores - mask_scores.detach())
                     masked_weight = n_layer.weight * binary_mask
                     out = F.linear(out, masked_weight, n_layer.bias)
                 else:
@@ -47,26 +51,27 @@ class MaskedForward(nn.Module):
             out = x.view(x.size(0), -1)  # Flatten input
             
             # Process fc1
-            mask_scores = self.mask.fc1.weight.abs()
-            mask_bin = self._binary_mask(mask_scores)
-            binary_mask = mask_bin + (mask_scores - mask_scores)
-            masked_weight = self.net.fc1.weight * binary_mask
-            out = F.linear(out, masked_weight, self.net.fc1.bias)
-            out = self.net.relu(out)
+            weight_scores = self.mask.fc1.weight.abs()
+            weight_mask = self._binary_mask(weight_scores)
+            masked_weight = self.net.fc1.weight * weight_mask
+            
+            # Usamos el bias directamente de mask (entrennable)
+            out = F.linear(out, masked_weight, self.mask.fc1.bias)
+            out = F.relu(out)
             
             # Process fc2
-            mask_scores = self.mask.fc2.weight.abs()
-            mask_bin = self._binary_mask(mask_scores)
-            binary_mask = mask_bin + (mask_scores - mask_scores)
-            masked_weight = self.net.fc2.weight * binary_mask
-            out = F.linear(out, masked_weight, self.net.fc2.bias)
-            out = self.net.relu(out)
+            weight_scores = self.mask.fc2.weight.abs()
+            weight_mask = self._binary_mask(weight_scores)
+            masked_weight = self.net.fc2.weight * weight_mask
+            
+            out = F.linear(out, masked_weight, self.mask.fc2.bias)
+            out = F.relu(out)
             
             # Process fc3 (output layer)
-            mask_scores = self.mask.fc3.weight.abs()
-            mask_bin = self._binary_mask(mask_scores)
-            binary_mask = mask_bin + (mask_scores - mask_scores)
-            masked_weight = self.net.fc3.weight * binary_mask
-            out = F.linear(out, masked_weight, self.net.fc3.bias)
+            weight_scores = self.mask.fc3.weight.abs()
+            weight_mask = self._binary_mask(weight_scores)
+            masked_weight = self.net.fc3.weight * weight_mask
+            
+            out = F.linear(out, masked_weight, self.mask.fc3.bias)
 
         return out
